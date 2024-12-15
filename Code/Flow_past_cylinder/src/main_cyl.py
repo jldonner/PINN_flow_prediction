@@ -502,7 +502,6 @@ plt.rc('ytick', labelsize=14)
 
 
 ##### Plotting losses
-
 fig, ax = plt.subplots(1,1, figsize=(9,4.5))
 
 
