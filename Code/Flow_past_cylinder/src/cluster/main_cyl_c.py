@@ -18,7 +18,7 @@ import glob, os, shutil, h5py
 
 
 # %% Define Constants
-Re = np.array([1000])
+Re = np.array([100])
 gamma = 0.000482
 u_in = 1
 v_in = 0
@@ -69,7 +69,27 @@ x_data = mesh['Coordinates']['x'][:]
 y_data = mesh['Coordinates']['y'][:]
 z_data = mesh['Coordinates']['z'][:]
 
+# %% Save to CSV
+np.savetxt(
+    "solution.csv", 
+    csv_data, 
+    delimiter=",", 
+    header="x,y,z,u,v,p", 
+    comments=''
+)
 
+
+# %% Load the CSV file
+
+data = np.loadtxt("solution.csv", delimiter=",", skiprows=1)
+
+# Extract columns (assuming columns in order: x,y,z,u,v,p)
+x = data[:, 0]
+y = data[:, 1]
+z = data[:, 2]
+u = data[:, 3]
+v = data[:, 4]
+p = data[:, 5]
 # %% Bounds
 
 # Set number of data points
