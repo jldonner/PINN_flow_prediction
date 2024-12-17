@@ -1,0 +1,2 @@
+model_checkpoint_path: "cylinder_flow_checkpoints_24-12-16_2115"
+all_model_checkpoint_paths: "cylinder_flow_checkpoints_24-12-16_2115"
