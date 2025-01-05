@@ -51,10 +51,6 @@ class PINN_PDE(PhysicsInformedNN):
     def __init__(self,
                  hid_activation,
                  out_activation,
-                 # x_l, x_L,  # Boundary locations in the x-direction
-                 # u_l, v_l, u_L, v_L,  # Boundary velocities at x_l and x_L
-                 # y_b, y_B,  # Boundary locations in the y-direction
-                 # u_b, v_b, u_B, v_B,  # Boundary velocities at y_b and y_B
                  x_boundary, y_boundary,
                  u_bc, v_bc,  # Boundary conditions
                  x_cylinder, y_cylinder,  # Cylinder points
@@ -113,9 +109,9 @@ class PINN_PDE(PhysicsInformedNN):
         """
 
         # # Physical loss (mass and momentum conservation)
-        # loss_mass, loss_momx, loss_momy = self.net_physical_loss()
-        loss_mass = self.net_physical_loss()
-        yS = loss_mass # + loss_momx + loss_momy
+        loss_mass, loss_momx, loss_momy = self.net_physical_loss()
+        # loss_mass = self.net_physical_loss()
+        yS = loss_mass + loss_momx + loss_momy
 
         # # Boundary loss
         yB = self.net_boundary_loss()
@@ -127,11 +123,11 @@ class PINN_PDE(PhysicsInformedNN):
         yD = self.net_data_loss()
 
         # Total loss
-        # total_loss = 10*yB + 10*yC + 100*yD + yS
-        # return total_loss, loss_mass, loss_momx, loss_momy, yB, yC, yD # return all of them to further analyse convergence behaviour of different losses
-    
         total_loss = 10*yB + 10*yC + 100*yD + yS
-        return total_loss, loss_mass, yB, yC, yD  # return all of them to further analyse convergence behaviour of different losses
+        return total_loss, loss_mass, loss_momx, loss_momy, yB, yC, yD # return all of them to further analyse convergence behaviour of different losses
+    
+        # total_loss = 10*yB + 10*yC + 100*yD + yS
+        # return total_loss, loss_mass, yB, yC, yD  # return all of them to further analyse convergence behaviour of different losses
 
     # # Data loss
     def net_data_loss(self): 
@@ -144,6 +140,8 @@ class PINN_PDE(PhysicsInformedNN):
 
         # Compute MSE for data points
         loss_data = tf.reduce_mean(tf.square(u_pred - self.u_data)) + tf.reduce_mean(tf.square(v_pred - self.v_data))
+        # 
+        loss_data = tf.reduce_mean(tf.square(u_pred - self.u_data)) # + tf.reduce_mean(tf.square(v_pred - self.v_data)) 
         return loss_data
 
 
@@ -201,10 +199,10 @@ class PINN_PDE(PhysicsInformedNN):
             v_y = tape.gradient(v, self.y_f)
 
         # # Compute second derivatives
-        # u_xx = tape.gradient(u_x, self.x_f)
-        # u_yy = tape.gradient(u_y, self.y_f)
-        # v_xx = tape.gradient(v_x, self.x_f)
-        # v_yy = tape.gradient(v_y, self.y_f)
+        u_xx = tape.gradient(u_x, self.x_f)
+        u_yy = tape.gradient(u_y, self.y_f)
+        v_xx = tape.gradient(v_x, self.x_f)
+        v_yy = tape.gradient(v_y, self.y_f)
             
         del tape
         
@@ -214,17 +212,17 @@ class PINN_PDE(PhysicsInformedNN):
         # rho eliminated
 
         l_mass = u_x + v_y  # Mass conservation
-        # l_momx = u * u_x + v * u_y + p_x - (1 / self.Re) * (u_xx + u_yy)  # x-momentum
-        # l_momy = u * v_x + v * v_y + p_y - (1 / self.Re) * (v_xx + v_yy)  # y-momentum
+        l_momx = u * u_x + v * u_y + p_x - (1 / self.Re) * (u_xx + u_yy)  # x-momentum
+        l_momy = u * v_x + v * v_y + p_y - (1 / self.Re) * (v_xx + v_yy)  # y-momentum
 
         # Compute MSE for physical losses
         loss_mass = tf.reduce_mean(tf.square(l_mass))
-        # loss_momx = tf.reduce_mean(tf.square(l_momx))
-        # loss_momy = tf.reduce_mean(tf.square(l_momy))
+        loss_momx = tf.reduce_mean(tf.square(l_momx))
+        loss_momy = tf.reduce_mean(tf.square(l_momy))
 
         # Total physical loss
-        # return loss_mass, loss_momx, loss_momy
-        return loss_mass # , loss_momx, loss_momy
+        return loss_mass, loss_momx, loss_momy
+        # return loss_mass # , loss_momx, loss_momy
 
 
     # For the final prediction

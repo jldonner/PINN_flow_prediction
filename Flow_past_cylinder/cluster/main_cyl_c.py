@@ -26,57 +26,57 @@ v_in = 0
 
 # %% Read paraview (simulation) data
 
-solutDir = './SOLUT/'
-solutName = 'solut_'
+# solutDir = './SOLUT/'
+# solutName = 'solut_'
 
-# get file names
-fileNames = glob.glob(solutDir+solutName+'*.h5')
-# sort fileNames
-timeStamps = [int(k.split('_')[-1].split('.')[0]) for k in fileNames]
-sortingIDX = np.argsort(timeStamps)
-sortedtimeStamps = [timeStamps[k] for k in sortingIDX]
-sortedFileNames = [fileNames[k] for k in sortingIDX]
+# # get file names
+# fileNames = glob.glob(solutDir+solutName+'*.h5')
+# # sort fileNames
+# timeStamps = [int(k.split('_')[-1].split('.')[0]) for k in fileNames]
+# sortingIDX = np.argsort(timeStamps)
+# sortedtimeStamps = [timeStamps[k] for k in sortingIDX]
+# sortedFileNames = [fileNames[k] for k in sortingIDX]
 
-# The SOLUT folder consisits of solution at every time stamp
-# In the intial few time stamps, the simulation is transient and converges 
-# to a steady state solution after few time stamps. 
-# We can use the data from the last h5 file in sortedFileNames 
-# as this will correspond to the steady state
+# # The SOLUT folder consisits of solution at every time stamp
+# # In the intial few time stamps, the simulation is transient and converges 
+# # to a steady state solution after few time stamps. 
+# # We can use the data from the last h5 file in sortedFileNames 
+# # as this will correspond to the steady state
 
-for k,m in zip(sortedFileNames,range(0,len(sortedFileNames))):
-    dat = h5py.File(k,'r')
-    rho = dat['GaseousPhase']['rho'][:]
-    rhou = dat['GaseousPhase']['rhou'][:]
-    rhov = dat['GaseousPhase']['rhov'][:]
-    rhow = dat['GaseousPhase']['rhow'][:]
-    U_data = rhou/rho
-    V_data = rhov/rho
-    W_data = rhow/rho
-    P_data = dat['Additionals']['pressure'][:]
+# for k,m in zip(sortedFileNames,range(0,len(sortedFileNames))):
+#     dat = h5py.File(k,'r')
+#     rho = dat['GaseousPhase']['rho'][:]
+#     rhou = dat['GaseousPhase']['rhou'][:]
+#     rhov = dat['GaseousPhase']['rhov'][:]
+#     rhow = dat['GaseousPhase']['rhow'][:]
+#     U_data = rhou/rho
+#     V_data = rhov/rho
+#     W_data = rhow/rho
+#     P_data = dat['Additionals']['pressure'][:]
     
-# YOU CAN GET THE KEY NAMES BY THE FOLLOWING COMMAND:
-print(dat.keys())
-# OR
-print(dat['GaseousPhase'].keys())
-print(dat['Additionals'].keys())
-# and acceess them as above in the loop
+# # YOU CAN GET THE KEY NAMES BY THE FOLLOWING COMMAND:
+# print(dat.keys())
+# # OR
+# print(dat['GaseousPhase'].keys())
+# print(dat['Additionals'].keys())
+# # and acceess them as above in the loop
 
-# you can get all the coordinates and the triangulation of the mesh from the mesh file
-# ATTENTION: for 2D, the plane is probably mirrored in z
-meshFile = './MESH/mesh.mesh.h5'
-mesh = h5py.File(meshFile,'r')
-x_data = mesh['Coordinates']['x'][:]
-y_data = mesh['Coordinates']['y'][:]
-z_data = mesh['Coordinates']['z'][:]
+# # you can get all the coordinates and the triangulation of the mesh from the mesh file
+# # ATTENTION: for 2D, the plane is probably mirrored in z
+# meshFile = './MESH/mesh.mesh.h5'
+# mesh = h5py.File(meshFile,'r')
+# x_data = mesh['Coordinates']['x'][:]
+# y_data = mesh['Coordinates']['y'][:]
+# z_data = mesh['Coordinates']['z'][:]
 
-# %% Save to CSV
-np.savetxt(
-    "solution.csv", 
-    csv_data, 
-    delimiter=",", 
-    header="x,y,z,u,v,p", 
-    comments=''
-)
+# # %% Save to CSV
+# np.savetxt(
+#     "solution.csv", 
+#     csv_data, 
+#     delimiter=",", 
+#     header="x,y,z,u,v,p", 
+#     comments=''
+# )
 
 
 # %% Load the CSV file
@@ -84,12 +84,14 @@ np.savetxt(
 data = np.loadtxt("solution.csv", delimiter=",", skiprows=1)
 
 # Extract columns (assuming columns in order: x,y,z,u,v,p)
-x = data[:, 0]
-y = data[:, 1]
-z = data[:, 2]
-u = data[:, 3]
-v = data[:, 4]
-p = data[:, 5]
+x_data = data[:, 0]
+y_data = data[:, 1]
+z_data = data[:, 2]
+U_data = data[:, 3]
+V_data = data[:, 4]
+P_data = data[:, 5]
+
+
 # %% Bounds
 
 # Set number of data points
@@ -381,7 +383,7 @@ lb_tensor = tf.convert_to_tensor(lb)
 
 # %% Create PINN class object
 
-layers = [2, 30, 30, 30, 30, 30, 30, 2]        # For initializing the field
+layers = [2, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 2]        # For initializing the field
 hid_activation = 'tanh'
 out_activation = 'tanh'
 
@@ -416,8 +418,8 @@ model = PINN_PDE(
 now = datetime.now()
 start_timestamp = now.strftime("%y-%m-%d_%H%M")
 
-adam_iterations = 1000
-lbfgs_max_iterations = 10000
+adam_iterations = 10
+lbfgs_max_iterations = 50
 
 """
 Time table:
