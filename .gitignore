@@ -1,3 +1,4 @@
 # Ignore all para view files
 *.h5
 *.xmf
+.DS_Store

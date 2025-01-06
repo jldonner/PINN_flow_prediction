@@ -115,7 +115,7 @@ class PINN_PDE(PhysicsInformedNN):
         # # Physical loss (mass and momentum conservation)
         # loss_mass, loss_momx, loss_momy = self.net_physical_loss()
         loss_mass = self.net_physical_loss()
-        yS = loss_mass # + loss_momx + loss_momy
+        yS = loss_mass# + loss_momx + loss_momy
 
         # # Boundary loss
         yB = self.net_boundary_loss()
@@ -127,10 +127,10 @@ class PINN_PDE(PhysicsInformedNN):
         yD = self.net_data_loss()
 
         # Total loss
-        # total_loss = 10*yB + 10*yC + 100*yD + yS
+        total_loss = 10*yB + 10*yC + 100*yD + yS
         # return total_loss, loss_mass, loss_momx, loss_momy, yB, yC, yD # return all of them to further analyse convergence behaviour of different losses
     
-        total_loss = 10*yB + 10*yC + 100*yD + yS
+        # total_loss = 10*yB + 10*yC + 100*yD + yS
         return total_loss, loss_mass, yB, yC, yD  # return all of them to further analyse convergence behaviour of different losses
 
     # # Data loss
