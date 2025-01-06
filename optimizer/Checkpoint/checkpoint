@@ -1,2 +1,0 @@
-model_checkpoint_path: "cylinder_flow_checkpoints"
-all_model_checkpoint_paths: "cylinder_flow_checkpoints"

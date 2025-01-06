@@ -1,4 +1,0 @@
-
-Copy full dir from cluster to local
-rsync -av --ignore-existing yadav@cluster-g.math.tu-berlin.de:/homes/smta/yadav/Jeremias/Code/Flow_past_cylinder/src/cluster1/ /Users/jeremiasdonner/Documents/Uni/WiSe24_25/TAP/Flow_past_cylinder/cluster1/
-
