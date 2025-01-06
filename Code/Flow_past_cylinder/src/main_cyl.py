@@ -18,7 +18,7 @@ import glob, os, shutil, h5py
 
 
 # %% Define Constants
-Re = np.array([1000])
+Re = np.array([100])
 gamma = 0.000482
 u_in = 1
 v_in = 0
@@ -214,16 +214,16 @@ v_boundary = np.concatenate([v_b, v_B, v_inlet])
 
 # %% Plot Cylinder points
 
-plt.figure(figsize=(6, 6))
-plt.scatter(x_inside, y_inside, s=5, c='red', label='LHS points inside cylinder')
-circle = plt.Circle((x_c, y_c), gamma, color='blue', fill=False, linewidth=2, label='Cylinder boundary')
-plt.gca().add_artist(circle)
-plt.gca().set_aspect('equal', adjustable='box')
-plt.title('LHS Points Inside the Cylinder')
-plt.legend()
-plt.show()
+# plt.figure(figsize=(6, 6))
+# plt.scatter(x_inside, y_inside, s=5, c='red', label='LHS points inside cylinder')
+# circle = plt.Circle((x_c, y_c), gamma, color='blue', fill=False, linewidth=2, label='Cylinder boundary')
+# plt.gca().add_artist(circle)
+# plt.gca().set_aspect('equal', adjustable='box')
+# plt.title('LHS Points Inside the Cylinder')
+# plt.legend()
+# plt.show()
 
-print(f"Number of points inside the cylinder: {len(x_inside)} (target was {N_c_internal})")
+# print(f"Number of points inside the cylinder: {len(x_inside)} (target was {N_c_internal})")
 
 # %% Incoorperate experimental Data points
 
@@ -267,61 +267,63 @@ y_collocation = Colloc_train[:, 1]
 
 # %% Plot domain
 
-# Create the plot
-plt.figure(figsize=(10, 10))  # Set figure size
+# # Create the plot
+# plt.figure(figsize=(10, 10))  # Set figure size
 
-# Plot each type of point using scatter with a unique color and label
-plt.scatter(x_data, y_data, color='red', s=10, label='Data Points', alpha=0.6)         # Data points in red
-plt.scatter(x_cylinder, y_cylinder, color='blue', s=10, label='Cylinder Points')       # Cylinder boundary points in blue
-plt.scatter(x_collocation, y_collocation, color='black', s=10, label='Collocation Points', alpha=1)  # Collocation points in green
+# # Plot each type of point using scatter with a unique color and label
+# plt.scatter(x_data, y_data, color='red', s=10, label='Data Points', alpha=0.6)         # Data points in red
+# plt.scatter(x_cylinder, y_cylinder, color='blue', s=10, label='Cylinder Points')       # Cylinder boundary points in blue
+# plt.scatter(x_collocation, y_collocation, color='black', s=10, label='Collocation Points', alpha=1)  # Collocation points in green
 
-# Add labels, title, and legend
-plt.xlabel('x-axis')
-plt.ylabel('y-axis')
-plt.title('Distribution of Data, Cylinder, and Collocation Points in the Domain')
-plt.legend(loc='best')  # Show legend at best location
-plt.axis('equal')  # Set equal axis for correct aspect ratio
-plt.grid(True, linestyle='--', alpha=0.5)  # Optional: Add a grid for better visualization
+# # Add labels, title, and legend
+# plt.xlabel('x-axis')
+# plt.ylabel('y-axis')
+# plt.title('Distribution of Data, Cylinder, and Collocation Points in the Domain')
+# plt.legend(loc='best')  # Show legend at best location
+# plt.axis('equal')  # Set equal axis for correct aspect ratio
+# plt.grid(True, linestyle='--', alpha=0.5)  # Optional: Add a grid for better visualization
 
-# Show the plot
-plt.show()
+# # Show the plot
+# plt.show()
 
 # %% Plot velocities of initial conditions
 
-x = x_boundary
-y = y_boundary
-u = u_boundary
-v = v_boundary
+# x = x_boundary
+# y = y_boundary
+# u = u_boundary
+# v = v_boundary
 
-# x = x_cylinder
-# y = y_cylinder
-# u = u_cylinder
-# v = v_cylinder
+# # x = x_cylinder
+# # y = y_cylinder
+# # u = u_cylinder
+# # v = v_cylinder
 
-# x = x_data
-# y = y_data
-# u = u_data
-# v = v_data
+# # x = x_data
+# # y = y_data
+# # u = u_data
+# # v = v_data
 
-# Plot for u
-plt.figure(figsize=(8, 6))
-plt.scatter(x, y, c=u, cmap='coolwarm', s=50, alpha=0.8)  # Color-coded by u
-plt.colorbar(label='Velocity u')
-plt.xlabel('x position')
-plt.ylabel('y position')
-plt.title('Spatial distribution of velocity u')
-plt.axis('equal')  # Set equal axis for correct aspect ratio
-plt.show()
+# # Plot for u
+# plt.figure(figsize=(8, 6))
+# plt.scatter(x, y, c=u, cmap='coolwarm', s=50, alpha=0.8)  # Color-coded by u
+# plt.colorbar(label='Velocity u')
+# plt.xlabel('x position')
+# plt.ylabel('y position')
+# plt.title('Spatial distribution of velocity u')
+# plt.axis('equal')  # Set equal axis for correct aspect ratio
+# plt.show()
 
-# Plot for v
-plt.figure(figsize=(8, 6))
-plt.scatter(x, y, c=v, cmap='coolwarm', s=50, alpha=0.8)  # Color-coded by v
-plt.colorbar(label='Velocity v')
-plt.xlabel('x position')
-plt.ylabel('y position')
-plt.title('Spatial distribution of velocity v')
-plt.axis('equal')  # Set equal axis for correct aspect ratio
-plt.show()
+# # Plot for v
+# plt.figure(figsize=(8, 6))
+# plt.scatter(x, y, c=v, cmap='coolwarm', s=50, alpha=0.8)  # Color-coded by v
+# plt.colorbar(label='Velocity v')
+# plt.xlabel('x position')
+# plt.ylabel('y position')
+# plt.title('Spatial distribution of velocity v')
+# plt.axis('equal')  # Set equal axis for correct aspect ratio
+# plt.show()
+
+
 # %% Coversion to tensorflow
 
 # Convert boundary points and conditions to tensors
@@ -359,9 +361,9 @@ lb_tensor = tf.convert_to_tensor(lb)
 
 # %% Create PINN class object
 
-layers = [2, 30, 30, 30, 30, 30, 30, 2]        # For initializing the field
+layers = [2, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 2]        # For initializing the field
 hid_activation = 'tanh'
-out_activation = 'tanh'
+out_activation = 'linear'
 
 model = PINN_PDE(
     hid_activation=hid_activation,
@@ -392,10 +394,10 @@ model = PINN_PDE(
 
 # %% Training
 now = datetime.now()
-start_timestamp = now.strftime("%y-%m-%d_%H%M")
+timestamp = now.strftime("%y-%m-%d_%H%M")
 
-adam_iterations = 1000
-lbfgs_max_iterations = 10000
+adam_iterations = 5000
+lbfgs_max_iterations = 50000
 
 """
 Time table:
@@ -408,21 +410,20 @@ Time table:
 """
 
 # Below two variables are used for piecewise learning rate scheduler for ADAM
-lr_list = [1e-3, 1e-4, 1e-5]    ## Learnig rate
-lr_epochs = [100,1000]        ## Epochs at which the learning rate should change
+lr_list = [1e-3, 1e-4, 1e-5]
+lr_epochs = [500, 1000]
 
-checkpoint_str = f'./Checkpoint/cylinder_flow_checkpoints_{start_timestamp}'
+checkpoint_str = f'./Checkpoint/cylinder_flow_checkpoints_{timestamp}'
 
 hist = model.train(adam_iterations, lbfgs_max_iterations, checkpoint_str, lr_epochs, lr_list)
 
 now = datetime.now()
 end_timestamp = now.strftime("%y-%m-%d_%H%M")
 
-print(f"Training start time: {start_timestamp} \n Training end time: {end_timestamp}. \n")
+print(f"Training start time: {timestamp} \n Training end time: {end_timestamp}. \n")
+
 
 # %% Save losses to lists
-now = datetime.now()
-timestamp = now.strftime("%y-%m-%d_%H%M")
 
 # Directory for saving the loss data
 output_dir = "./loss_data"
@@ -437,60 +438,10 @@ with open(loss_file, 'wb') as f:
 
 print(f"Loss data saved to {loss_file}")
 
-# %% load loss lists
 
-# Load the .pkl file
-pkl_file = './loss_data/losses_24-12-15_1439.pkl'  # Replace with your file path
 
-with open(pkl_file, 'rb') as file:
-    saved_data = pickle.load(file)
-
-# Extract the loss list from the loaded data
-full_loss_list = saved_data
-
-# %% Loss curve of loaded losses
-now = datetime.now()
-timestamp = now.strftime("%y-%m-%d_%H%M")
-
-output_dir = "./plots"
-os.makedirs(output_dir, exist_ok=True)
-
-plt.rc('font', family='serif')
-plt.rc('font', size=14)
-plt.rc('xtick', labelsize=14)
-plt.rc('ytick', labelsize=14)
-
-##### Plotting losses
-
-fig, ax = plt.subplots(1, 1, figsize=(9, 4.5))
-
-# Plot losses from loaded data
-ax.semilogy(full_loss_list[0], linewidth=3, label='Total loss', color='#1f77b4')  # Blue
-ax.semilogy(full_loss_list[1], linewidth=3, label='Mass cons loss', color='#ff7f0e')  # Orange
-ax.semilogy(full_loss_list[2], linewidth=3, label='Momentum cons loss (x)', color='#2ca02c')  # Green
-ax.semilogy(full_loss_list[3], linewidth=3, label='Momentum cons loss (y)', color='#9467bd')  # Purple
-ax.semilogy(full_loss_list[4], linewidth=3, label='Boundary loss', color='#d62728')  # Red
-ax.semilogy(full_loss_list[5], linewidth=3, label='Cylinder loss', color='#17becf')  # Cyan
-ax.semilogy(full_loss_list[6], linewidth=3, label='Data loss', color='#bcbd22')  # Yellow-green
-
-# Add vertical line at epoch = 200
-ax.axvline(x=200, color='gray', linestyle='--', linewidth=2, label='Epoch 200')
-
-ax.set_xlabel('Epochs')
-ax.set_ylabel('MSE')
-
-ax.legend(ncol=2)
-plt.tight_layout()
-
-# Save the plot
-output_file = os.path.join(output_dir, f"loss_curve_{timestamp}.png")
-plt.savefig(output_file, dpi=300, bbox_inches='tight')  # Save with high resolution
-
-plt.show()
 
 # %% Loss curve
-now = datetime.now()
-timestamp = now.strftime("%y-%m-%d_%H%M")
 
 output_dir = "./plots"
 os.makedirs(output_dir, exist_ok=True)
@@ -522,7 +473,8 @@ ax.semilogy(model.full_loss_list[4], linewidth=3, label='Data loss',
             color='#000000')  # Yellow-green
 
 # Add vertical line at epoch = 200
-ax.axvline(x=lr_epochs[0], color='gray', linestyle='--', linewidth=2, label='Epoch 200')
+ax.axvline(x=lr_epochs[0], color='gray', linestyle='--', linewidth=2, label=f'Epoch {lr_epochs[0]}')
+ax.axvline(x=lr_epochs[1], color='gray', linestyle='--', linewidth=2, label=f'Epoch {lr_epochs[1]}')
 
 ax.set_xlabel('Epochs')
 ax.set_ylabel('MSE')
@@ -539,17 +491,9 @@ plt.savefig(output_file, dpi=300, bbox_inches='tight')  # Save with high resolut
 plt.show()
 
 
-# %% Loading trained weights (Will be useful when the models are trained on clusters)
-checkpoint_str = f'./Checkpoint/'
-model.model.load_weights(checkpoint_str)
-# 
 # %% Field prediction
 
 u_pred, v_pred = model.predict(x_collocation_tensor, y_collocation_tensor)
-
-## Rescaling back from the non-dimensional form to the dimensional form
-# u_pred = np.array(u_pred)
-# v_pred = np.array(v_pred)
 
 # %% Plotting the u-v field
 
@@ -558,16 +502,14 @@ os.makedirs(pred_dir, exist_ok=True)
 
 plt.figure(figsize=(10, 10))  # Set figure size
 
-# Predict at experimental data points
-x_data = x_data_tensor.numpy()
-y_data = y_data_tensor.numpy()
-xy_data = np.hstack((x_data, y_data))  # Combine x and y
-u_data_pred, v_data_pred = model.predict(x_data, y_data)
+# # Predict at experimental data points
+# x_data = x_data_tensor.numpy()
+# y_data = y_data_tensor.numpy()
+# u_data_pred, v_data_pred = model.predict(x_data, y_data)
 
 # Predict at collocation points
-x_f = x_collocation_tensor.numpy()
-y_f = y_collocation_tensor.numpy()
-xy_colloc = np.hstack((x_f, y_f))
+x_f = x_collocation_tensor
+y_f = y_collocation_tensor
 u_colloc_pred, v_colloc_pred = model.predict(x_f, y_f)
 
 # Create a uniform grid for x and y (100x100 grid as an example)
@@ -586,7 +528,7 @@ plt.contourf(X, Y, Z, levels=50, cmap='viridis')
 plt.colorbar()
 plt.xlabel('x')
 plt.ylabel('y')
-plt.title(f'u/v-pred: yB+yC+yD+mass, adam: {adam_iterations}, LBFGS: {lbfgs_max_iterations}')
+plt.title(f'u/v-pred: yB+yC+yD+yS, adam: 5k, LBFGS: 50k, OOM aborted')
 plt.axis('equal')  # Set equal axis for correct aspect ratio
 
 # Save the plot
@@ -595,3 +537,98 @@ plt.savefig(output_file, dpi=300, bbox_inches='tight')
 
 plt.show()
 
+# %% ----- LOADING SECTION -----
+
+# Loading trained weights (Will be useful when the models are trained on clusters)
+checkpoint_str = f'./cluster4/Checkpoint/cylinder_flow_checkpoints_24-12-17_1639'
+model.model.load_weights(checkpoint_str)
+
+# %% load loss lists
+
+# Load the .pkl file
+pkl_file = './cluster4/loss_data/losses_24-12-17_2225.pkl'  # Replace with your file path
+timestamp = pkl_file[-17:-4]
+
+with open(pkl_file, 'rb') as file:
+    full_loss_list = pickle.load(file)
+
+
+# %% Plotting the u-v field
+
+pred_dir = "./plots/predictions"
+os.makedirs(pred_dir, exist_ok=True)
+
+plt.figure(figsize=(10, 10))  # Set figure size
+
+# # Predict at experimental data points
+# x_data = x_data_tensor.numpy()
+# y_data = y_data_tensor.numpy()
+# u_data_pred, v_data_pred = model.predict(x_data, y_data)
+
+# Predict at collocation points
+x_f = x_collocation_tensor
+y_f = y_collocation_tensor
+u_colloc_pred, v_colloc_pred = model.predict(x_f, y_f)
+
+# Create a uniform grid for x and y (100x100 grid as an example)
+x_grid = np.linspace(np.min(x_data), np.max(x_data), 100)
+y_grid = np.linspace(np.min(y_data), np.max(y_data), 100)
+X, Y = np.meshgrid(x_grid, y_grid)
+
+# Compute velocity magnitude at each data point
+velocity_magnitude = np.sqrt(u_colloc_pred**2 + v_colloc_pred**2)
+
+# Interpolate the scattered velocity magnitude data onto the uniform grid
+Z = griddata((x_f, y_f), velocity_magnitude, (X, Y), method='cubic')
+
+# Plot contour of velocity magnitude
+plt.contourf(X, Y, Z, levels=50, cmap='viridis')
+plt.colorbar()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title(f'u/v-pred: yB+yC+yD+yS, u from v, adam: 5k, LBFGS: 50k')
+plt.axis('equal')  # Set equal axis for correct aspect ratio
+
+# Save the plot
+output_file = os.path.join(pred_dir, f"prediction_{timestamp}.png")
+plt.savefig(output_file, dpi=300, bbox_inches='tight')
+
+plt.show()
+
+# %% Loss curve of loaded losses
+output_dir = "./plots"
+os.makedirs(output_dir, exist_ok=True)
+
+plt.rc('font', family='serif')
+plt.rc('font', size=14)
+plt.rc('xtick', labelsize=14)
+plt.rc('ytick', labelsize=14)
+
+##### Plotting losses
+
+fig, ax = plt.subplots(1, 1, figsize=(9, 4.5))
+
+# Plot losses from loaded data
+ax.semilogy(full_loss_list[0], linewidth=3, label='Total loss', color='#1f77b4')  # Blue
+ax.semilogy(full_loss_list[1], linewidth=3, label='Mass cons loss', color='#ff7f0e')  # Orange
+ax.semilogy(full_loss_list[2], linewidth=3, label='Momentum cons loss (x)', color='#2ca02c')  # Green
+ax.semilogy(full_loss_list[3], linewidth=3, label='Momentum cons loss (y)', color='#9467bd')  # Purple
+ax.semilogy(full_loss_list[4], linewidth=3, label='Boundary loss', color='#d62728')  # Red
+ax.semilogy(full_loss_list[5], linewidth=3, label='Cylinder loss', color='#17becf')  # Cyan
+ax.semilogy(full_loss_list[6], linewidth=3, label='Data loss', color='#000000')  # Yellow-green
+
+# Add vertical line at epoch = 200
+ax.axvline(x=200, color='gray', linestyle='--', linewidth=2, label='Epoch 200')
+
+ax.set_xlabel('Epochs')
+ax.set_ylabel('MSE')
+plt.title(f'u/v-pred: yB+yC+yD+yS, u from v, adam: 5k, LBFGS: 50k')
+
+ax.legend(ncol=2)
+plt.tight_layout()
+
+# Save the plot
+output_file = os.path.join(output_dir, f"loss_curve_{timestamp}.png")
+plt.savefig(output_file, dpi=300, bbox_inches='tight')  # Save with high resolution
+
+plt.show()
