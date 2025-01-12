@@ -1,0 +1,2 @@
+model_checkpoint_path: "1D_flame_theta_as_data_loss"
+all_model_checkpoint_paths: "1D_flame_theta_as_data_loss"
