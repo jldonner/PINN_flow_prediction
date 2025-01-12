@@ -2,3 +2,10 @@
 *.h5
 *.xmf
 .DS_Store
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
