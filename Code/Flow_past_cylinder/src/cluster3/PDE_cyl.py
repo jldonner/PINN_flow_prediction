@@ -51,6 +51,10 @@ class PINN_PDE(PhysicsInformedNN):
     def __init__(self,
                  hid_activation,
                  out_activation,
+                 # x_l, x_L,  # Boundary locations in the x-direction
+                 # u_l, v_l, u_L, v_L,  # Boundary velocities at x_l and x_L
+                 # y_b, y_B,  # Boundary locations in the y-direction
+                 # u_b, v_b, u_B, v_B,  # Boundary velocities at y_b and y_B
                  x_boundary, y_boundary,
                  u_bc, v_bc,  # Boundary conditions
                  x_cylinder, y_cylinder,  # Cylinder points
@@ -109,9 +113,9 @@ class PINN_PDE(PhysicsInformedNN):
         """
 
         # # Physical loss (mass and momentum conservation)
-        # loss_mass, loss_momx, loss_momy = self.net_physical_loss()
-        loss_mass = self.net_physical_loss()
-        yS = loss_mass
+        loss_mass, loss_momx, loss_momy = self.net_physical_loss()
+        # loss_mass = self.net_physical_loss()
+        yS = loss_momx + loss_momy
 
         # # Boundary loss
         yB = self.net_boundary_loss()
@@ -124,10 +128,10 @@ class PINN_PDE(PhysicsInformedNN):
 
         # Total loss
         total_loss = 10*yB + 10*yC + 100*yD + yS
-        return total_loss, loss_mass, yB, yC, yD # return all of them to further analyse convergence behaviour of different losses
+        # return total_loss, loss_mass, loss_momx, loss_momy, yB, yC, yD # return all of them to further analyse convergence behaviour of different losses
     
         # total_loss = 10*yB + 10*yC + 100*yD + yS
-        # return total_loss, loss_mass, yB, yC, yD  # return all of them to further analyse convergence behaviour of different losses
+        return total_loss, loss_momx, loss_momy, yB, yC, yD, yS  # return all of them to further analyse convergence behaviour of different losses
 
     # # Data loss
     def net_data_loss(self): 

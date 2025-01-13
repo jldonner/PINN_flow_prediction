@@ -84,17 +84,6 @@ y_B = y_data.max()
 # positioning the cylinder's center, here center of the domain
 x_c, y_c = 0, 0
 
-# Lower bounds
-lbx = np.array([x_l])   # Global Lower bound for time and x variables
-lby = np.array([y_b])   # Global Lower bound for time and x variables
-
-# Upper bounds
-ubx = np.array([x_L])  # Global Upper bound for time and x variables
-uby = np.array([y_B])  # Global Upper bound for time and x variables
-
-lb = np.array([lbx, lby])
-ub = np.array([ubx, uby])
-
 # This is used for scaling from (0,1) to (-1,1)
 scale_out = [2.0, 1.0]
 scale_max = U_data.max()
@@ -109,20 +98,28 @@ N_c_border = int(N_bound_x/10)
 N_c_internal = int(N_bound_x)
 
 # Frame boundaries
-x_border = np.linspace(x_l, x_L, N_bound_x).reshape(-1, 1)  # x points for left/right borders
-y_border = np.linspace(y_b, y_B, N_bound_y).reshape(-1, 1)  # y points for bottom/top borders
+x_wall = np.linspace(x_l, x_L, N_bound_x).reshape(-1, 1)  # x points for left/right borders
+y_wall = np.linspace(y_b, y_B, N_bound_y).reshape(-1, 1)  # y points for bottom/top borders
+
+inlet_mask = x_data == x_l
 
 # Bottom boundary (y = y_b)
-y_bbound = np.hstack((x_border, np.full_like(x_border, y_b)))
+y_bbound = np.hstack((x_wall, np.full_like(x_wall, y_b)))
 
 # Top boundary (y = y_B)
-y_Bbound = np.hstack((x_border, np.full_like(x_border, y_B)))
+y_Bbound = np.hstack((x_wall, np.full_like(x_wall, y_B)))
 
 # Left boundary (x = x_l)
-x_lbound = np.hstack((np.full_like(y_border, x_l), y_border))
+# Left boundary (x = x_l): Extract both x and y coordinates
+x_inlet = x_data[inlet_mask]  # x-coordinates at the inlet
+y_inlet = y_data[inlet_mask]  # y-coordinates at the inlet
+x_lbound = np.hstack((x_inlet.reshape(-1, 1), y_inlet.reshape(-1, 1)))
+# as the boundary conditions at inlet will use 
+# the experimental data it is best to use the 
+# respective x/y coordinates for the lBound 
 
 # Right boundary (x = x_L)
-x_Lbound = np.hstack((np.full_like(y_border, x_L), y_border))
+x_Lbound = np.hstack((np.full_like(y_wall, x_L), y_wall))
 
 # Cylinder surface points (approximate using polar coordinates)
 phi_c = np.linspace(0, 2 * np.pi, N_c_border).reshape(-1, 1)
@@ -149,17 +146,17 @@ cylinder_points_inside = np.hstack((x_inside.reshape(-1, 1), y_inside.reshape(-1
 # %% Formulate Boundary Conditions
 
 # Inlet boundary (x = x_l)
-# u_inlet = np.squeeze(10 * np.sin(np.pi * (y_border - y_b) / (y_B - y_b)))  # Normalize y to [0, π] range
-u_inlet = np.full(len(y_border), u_in)  # u velocity at the inlet
-v_inlet = np.full(len(y_border), v_in)  # v velocity at the inlet
+# u_inlet = np.squeeze(10 * np.sin(np.pi * (y_wall - y_b) / (y_B - y_b)))  # Normalize y to [0, π] range
+u_inlet = U_data[inlet_mask]  # Extract u-velocity at inlet
+v_inlet = V_data[inlet_mask]  # Extract v-velocity at inlet
 
 # No-slip condition on the bottom boundary (y = y_b)
-u_b = np.zeros(len(x_border))  # u velocity at the bottom
-v_b = np.zeros(len(x_border))  # v velocity at the bottom
+u_b = np.zeros(len(x_wall))  # u velocity at the bottom
+v_b = np.zeros(len(x_wall))  # v velocity at the bottom
 
 # No-slip condition on the top boundary (y = y_B)
-u_B = np.zeros(len(x_border))  # u velocity at the top
-v_B = np.zeros(len(x_border))  # v velocity at the top
+u_B = np.zeros(len(x_wall))  # u velocity at the top
+v_B = np.zeros(len(x_wall))  # v velocity at the top
 
 # %% Create Boundary Data Set
 
@@ -176,7 +173,7 @@ top_data = np.hstack((top_points, top_conditions))
 # Inlet boundary (x = x_l)
 inlet_points = x_lbound
 inlet_conditions = np.hstack((u_inlet.reshape(-1, 1), v_inlet.reshape(-1, 1)))
-inlet_data = np.hstack((inlet_points, inlet_conditions))
+# inlet_data = np.hstack((inlet_points, inlet_conditions))
 
 # Combine cylinder boundary and internal points
 cylinder_points = np.vstack((cylinder_points_boundary, cylinder_points_inside))
@@ -267,10 +264,10 @@ y_collocation = Colloc_train[:, 1]
 
 # %% Plot domain
 
-# # Create the plot
+# Create the plot
 # plt.figure(figsize=(10, 10))  # Set figure size
 
-# # Plot each type of point using scatter with a unique color and label
+# Plot each type of point using scatter with a unique color and label
 # plt.scatter(x_data, y_data, color='red', s=10, label='Data Points', alpha=0.6)         # Data points in red
 # plt.scatter(x_cylinder, y_cylinder, color='blue', s=10, label='Cylinder Points')       # Cylinder boundary points in blue
 # plt.scatter(x_collocation, y_collocation, color='black', s=10, label='Collocation Points', alpha=1)  # Collocation points in green
@@ -298,10 +295,10 @@ y_collocation = Colloc_train[:, 1]
 # # u = u_cylinder
 # # v = v_cylinder
 
-# # x = x_data
-# # y = y_data
-# # u = u_data
-# # v = v_data
+# x = x_data
+# y = y_data
+# u = u_data
+# v = v_data
 
 # # Plot for u
 # plt.figure(figsize=(8, 6))
@@ -324,40 +321,84 @@ y_collocation = Colloc_train[:, 1]
 # plt.show()
 
 
-# %% Coversion to tensorflow
+# %% Conversion to dimensionless problem
 
-# Convert boundary points and conditions to tensors
-x_boundary_tensor = tf.convert_to_tensor(x_boundary)
-y_boundary_tensor = tf.convert_to_tensor(y_boundary)
-u_bc_tensor = tf.convert_to_tensor(u_boundary)
-v_bc_tensor = tf.convert_to_tensor(v_boundary)
+# Define characteristic scales
+char_len = gamma  # Characteristic length, e.g., cylinder diameter
+char_vel = np.mean(u_inlet)  # Characteristic velocity, e.g., inlet velocity
 
-# Convert cylinder boundary points to tensors
-x_cylinder_tensor = tf.convert_to_tensor(x_cylinder)
-y_cylinder_tensor = tf.convert_to_tensor(y_cylinder)
-u_cylinder_tensor = tf.convert_to_tensor(u_cylinder)
-v_cylinder_tensor = tf.convert_to_tensor(v_cylinder)
+# Non-dimensionalize variables
+x_boundary_scaled = x_boundary / char_len
+y_boundary_scaled = y_boundary / char_len
+u_bc_scaled = u_boundary / char_vel
+v_bc_scaled = v_boundary / char_vel
 
-# Convert experimental data to tensors
-x_data_tensor = tf.convert_to_tensor(x_data)
-y_data_tensor = tf.convert_to_tensor(y_data)
-u_data_tensor = tf.convert_to_tensor(u_data)
-v_data_tensor = tf.convert_to_tensor(v_data)
+x_cylinder_scaled = x_cylinder / char_len
+y_cylinder_scaled = y_cylinder / char_len
+u_cylinder_scaled = u_cylinder / char_vel
+v_cylinder_scaled = v_cylinder / char_vel
 
-# Convert collocation points to tensors
-x_collocation_tensor = tf.convert_to_tensor(x_collocation)
-y_collocation_tensor = tf.convert_to_tensor(y_collocation)
+x_data_scaled = x_data / char_len
+y_data_scaled = y_data / char_len
+u_data_scaled = u_data / char_vel
+v_data_scaled = v_data / char_vel
+
+x_collocation_scaled = x_collocation / char_len
+y_collocation_scaled = y_collocation / char_len
+
+# Constants (if needed for loss functions or calculations)
+Re_scaled = Re  # Reynolds number is already dimensionless
+gamma_scaled = gamma / char_len
+
+# Lower bounds (scaled)
+lbx = np.array([x_l / char_len])   # Global lower bound scaled
+lby = np.array([y_b / char_len])   # Global lower bound scaled
+
+# Upper bounds (scaled)
+ubx = np.array([x_L / char_len])   # Global upper bound scaled
+uby = np.array([y_B / char_len])   # Global upper bound scaled
+
+# Combine scaled bounds
+lb = np.array([lbx, lby])  # Scaled lower bounds
+ub = np.array([ubx, uby])  # Scaled upper bounds
+
+
+# %% Conversion to TensorFlow Tensors
+
+# Convert to tensors (already scaled) with explicit dtype
+x_boundary_tensor = tf.convert_to_tensor(x_boundary_scaled, dtype=tf.float32)
+y_boundary_tensor = tf.convert_to_tensor(y_boundary_scaled, dtype=tf.float32)
+u_bc_tensor = tf.convert_to_tensor(u_bc_scaled, dtype=tf.float32)
+v_bc_tensor = tf.convert_to_tensor(v_bc_scaled, dtype=tf.float32)
+
+# Cylinder boundary tensors
+x_cylinder_tensor = tf.convert_to_tensor(x_cylinder_scaled, dtype=tf.float32)
+y_cylinder_tensor = tf.convert_to_tensor(y_cylinder_scaled, dtype=tf.float32)
+u_cylinder_tensor = tf.convert_to_tensor(u_cylinder_scaled, dtype=tf.float32)
+v_cylinder_tensor = tf.convert_to_tensor(v_cylinder_scaled, dtype=tf.float32)
+
+# Experimental data tensors
+x_data_tensor = tf.convert_to_tensor(x_data_scaled, dtype=tf.float32)
+y_data_tensor = tf.convert_to_tensor(y_data_scaled, dtype=tf.float32)
+u_data_tensor = tf.convert_to_tensor(u_data_scaled, dtype=tf.float32)
+v_data_tensor = tf.convert_to_tensor(v_data_scaled, dtype=tf.float32)
+
+# Collocation point tensors
+x_collocation_tensor = tf.convert_to_tensor(x_collocation_scaled, dtype=tf.float32)
+y_collocation_tensor = tf.convert_to_tensor(y_collocation_scaled, dtype=tf.float32)
 
 # Constants
-Re_tensor = tf.convert_to_tensor(Re)
-gamma_tensor = tf.convert_to_tensor(gamma)
+Re_tensor = tf.convert_to_tensor(Re_scaled, dtype=tf.float32)
+gamma_tensor = tf.convert_to_tensor(gamma_scaled, dtype=tf.float32)
 
-# Scaling
-scale_max_tensor = tf.convert_to_tensor(scale_max)
-scale_min_tensor = tf.convert_to_tensor(scale_min)
+# Scaling tensors
+scale_max_tensor = tf.convert_to_tensor(scale_max, dtype=tf.float32)
+scale_min_tensor = tf.convert_to_tensor(scale_min, dtype=tf.float32)
 
-ub_tensor = tf.convert_to_tensor(ub)
-lb_tensor = tf.convert_to_tensor(lb)
+# Domain bounds
+ub_tensor = tf.convert_to_tensor(ub, dtype=tf.float32)
+lb_tensor = tf.convert_to_tensor(lb, dtype=tf.float32)
+
 
 # %% Create PINN class object
 
@@ -413,7 +454,7 @@ Time table:
 lr_list = [1e-3, 1e-4, 1e-5]
 lr_epochs = [500, 1000]
 
-checkpoint_str = f'./Checkpoint/cylinder_flow_checkpoints_{timestamp}'
+checkpoint_str = f'./Checkpoint/cylinder_flow_checkpoints_{timestamp}.weights.h5'
 
 hist = model.train(adam_iterations, lbfgs_max_iterations, checkpoint_str, lr_epochs, lr_list)
 
