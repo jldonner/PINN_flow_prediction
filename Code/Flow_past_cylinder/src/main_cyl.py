@@ -72,8 +72,6 @@ z_data = mesh['Coordinates']['z'][:]
 
 # %% Bounds
 
-# Set number of data points
-
 # Set boundary, taken from min/max of available data
 x_l = x_data.min()
 x_L = x_data.max()
@@ -437,8 +435,8 @@ model = PINN_PDE(
 now = datetime.now()
 timestamp = now.strftime("%y-%m-%d_%H%M")
 
-adam_iterations = 5000
-lbfgs_max_iterations = 50000
+adam_iterations = 500
+lbfgs_max_iterations = 5000
 
 """
 Time table:
@@ -502,10 +500,10 @@ ax.semilogy(model.full_loss_list[0], linewidth=3, label='Total loss',
             color='#1f77b4')  # Blue
 ax.semilogy(model.full_loss_list[1], linewidth=3, label='Mass cons loss', 
             color='#ff7f0e')  # Orange
-# ax.semilogy(model.full_loss_list[2], linewidth=3, label='Momentum cons loss (x)',
-#             color='#2ca02c')  # Green
-# ax.semilogy(model.full_loss_list[3], linewidth=3, label='Momentum cons loss (y)',
-#             color='#9467bd')  # Purple
+ax.semilogy(model.full_loss_list[2], linewidth=3, label='Momentum cons loss (x)',
+            color='#2ca02c')  # Green
+ax.semilogy(model.full_loss_list[3], linewidth=3, label='Momentum cons loss (y)',
+            color='#9467bd')  # Purple
 ax.semilogy(model.full_loss_list[2], linewidth=3, label='Boundary loss',
             color='#d62728')  # Red
 ax.semilogy(model.full_loss_list[3], linewidth=3, label='Cylinder loss',
@@ -569,7 +567,7 @@ plt.contourf(X, Y, Z, levels=50, cmap='viridis')
 plt.colorbar()
 plt.xlabel('x')
 plt.ylabel('y')
-plt.title(f'u/v-pred: yB+yC+yD+yS, adam: 5k, LBFGS: 50k, OOM aborted')
+plt.title(f'u/v-pred: yB+yC+yD+yS, adam: 500, LBFGS: 5k')
 plt.axis('equal')  # Set equal axis for correct aspect ratio
 
 # Save the plot

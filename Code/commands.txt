@@ -1,4 +1,20 @@
 
-Copy full dir from cluster to local
-rsync -av --ignore-existing yadav@cluster-g.math.tu-berlin.de:/homes/smta/yadav/Jeremias/Code/Flow_past_cylinder/src/cluster1/ /Users/jeremiasdonner/Documents/Uni/WiSe24_25/TAP/Flow_past_cylinder/cluster1/
+ssh yadav@cluster-g.math.tu-berlin.de
+
+scp -r /Users/jericho/Documents/Uni/WS24_25/TAP/Code/Flow_past_cylinder/src/clusters yadav@cluster-g.math.tu-berlin.de:/homes/smta/yadav/Jeremias/Flow_past_cylinder
+
+
+
+
+Copy full dir from cluster to local ignoring files that already exist
+rsync -av --ignore-existing yadav@cluster-g.math.tu-berlin.de:/homes/smta/yadav/Jeremias/Code/Flow_past_cylinder/src/cluster1/ /Users/jericho/Documents/Uni/WS24_25/TAP/Code/Flow_past_cylinder/src/cluster1/
+
+rsync -av --ignore-existing /Users/jericho/Documents/Uni/WS24_25/TAP/Code/Flow_past_cylinder/src/cluster1/ yadav@cluster-g.math.tu-berlin.de:/homes/smta/yadav/Jeremias/Code/Flow_past_cylinder/src/cluster1/
+
+
+
+Copy full dir from cluster to local overwriting everything that already exists
+rsync -av yadav@cluster-g.math.tu-berlin.de:/homes/smta/yadav/Jeremias/Code/Flow_past_cylinder/src/cluster1/ /Users/jericho/Documents/Uni/WS24_25/TAP/Code/Flow_past_cylinder/src/cluster1/
+
+rsync -av /Users/jericho/Documents/Uni/WS24_25/TAP/Code/Flow_past_cylinder/src/cluster1 yadav@cluster-g.math.tu-berlin.de:/homes/smta/yadav/Jeremias/Code/Flow_past_cylinder/src/cluster1
 
