@@ -1,6 +1,6 @@
 # Thermoacoustic Project — PINN Cylinder Flow
 
-This project implements a **Physics-Informed Neural Network (PINN)** to model 2-D incompressible flow around a cylinder. The PINN combines physics laws (continuity + momentum), boundary conditions (walls, inlet, cylinder), and velocity data (from HDF5 simulation snapshots) into a single loss function.
+This project implements a **Physics-Informed Neural Network (PINN)** to model 2-D incompressible flow around a cylinder. The PINN combines physics laws (continuity + momentum), boundary conditions (walls, inlet, cylinder), and velocity data (from HDF5 simulation snapshots) into a single loss function. The Purpose is to interpolate timesteps of captured snapshot data.
 
 ---
 
